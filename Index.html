@@ -3,365 +3,595 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Steel Brainrot - Key System</title>
+    <title>Steal a brainrot hub - Key System</title>
     <style>
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
             font-family: 'Arial', sans-serif;
+            transition: all 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
         }
         
         body {
-            background: linear-gradient(135deg, #1a1a2e, #16213e, #0f3460);
-            color: white;
             min-height: 100vh;
             padding: 20px;
+            overflow-x: hidden;
         }
-        
+
+        @keyframes gradientAnimation {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        body.dark-theme {
+            background: linear-gradient(-45deg, #1a1a2e, #16213e, #0f3460, #2980b9);
+            background-size: 400% 400%;
+            animation: gradientAnimation 15s ease infinite;
+            color: white;
+        }
+
+        body.light-theme {
+            background: linear-gradient(-45deg, #ffffff, #f8f9fa, #e9ecef, #dee2e6);
+            background-size: 400% 400%;
+            animation: gradientAnimation 15s ease infinite;
+            color: black;
+        }
+
         .container {
             max-width: 800px;
             margin: 0 auto;
+            animation: fadeInUp 0.8s ease-out;
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
+
+        @keyframes float {
+            0% { transform: translateY(0px); }
+            50% { transform: translateY(-10px); }
+            100% { transform: translateY(0px); }
+        }
+
+        .settings-panel {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding: 20px;
+            border-radius: 15px;
+            backdrop-filter: blur(20px);
+            animation: slideDown 0.6s ease-out;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+        }
+
+        @keyframes slideDown {
+            from {
+                opacity: 0;
+                transform: translateY(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .dark-theme .settings-panel {
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .light-theme .settings-panel {
+            background: rgba(255, 255, 255, 0.8);
+            border: 1px solid rgba(0, 0, 0, 0.1);
+        }
+
+        .theme-toggle, .lang-toggle {
+            padding: 12px 20px;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: bold;
+            transition: all 0.3s ease;
+        }
+
+        .dark-theme .theme-toggle, .dark-theme .lang-toggle {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        .light-theme .theme-toggle, .light-theme .lang-toggle {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        .theme-toggle:hover, .lang-toggle:hover {
+            transform: translateY(-3px);
+            animation: pulse 1s infinite;
         }
         
         .header {
             text-align: center;
             margin-bottom: 40px;
-            padding: 30px;
+            padding: 40px;
+            border-radius: 20px;
+            backdrop-filter: blur(20px);
+            animation: float 6s ease-in-out infinite;
+        }
+
+        .dark-theme .header {
             background: rgba(255, 255, 255, 0.1);
-            border-radius: 15px;
-            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .light-theme .header {
+            background: rgba(255, 255, 255, 0.8);
+            border: 1px solid rgba(0, 0, 0, 0.1);
         }
         
         .logo {
-            font-size: 2.5em;
+            font-size: 2.8em;
             font-weight: bold;
-            background: linear-gradient(45deg, #ff6b6b, #feca57);
+            background: linear-gradient(45deg, #ff6b6b, #feca57, #48dbfb, #ff9ff3);
+            background-size: 300% 300%;
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
             margin-bottom: 10px;
+            animation: gradientAnimation 3s ease infinite, float 4s ease-in-out infinite;
         }
         
         .key-form {
-            background: rgba(255, 255, 255, 0.1);
-            padding: 30px;
-            border-radius: 15px;
-            backdrop-filter: blur(10px);
+            padding: 35px;
+            border-radius: 20px;
+            backdrop-filter: blur(20px);
             margin-bottom: 30px;
+            animation: fadeInUp 0.8s ease-out 0.2s both;
+        }
+
+        .dark-theme .key-form {
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .light-theme .key-form {
+            background: rgba(255, 255, 255, 0.8);
+            border: 1px solid rgba(0, 0, 0, 0.1);
+        }
+
+        .key-form:hover {
+            transform: translateY(-5px);
         }
         
         .form-group {
-            margin-bottom: 20px;
+            margin-bottom: 25px;
         }
         
         label {
             display: block;
-            margin-bottom: 8px;
+            margin-bottom: 12px;
+            font-weight: bold;
+            font-size: 1.1em;
+        }
+
+        .dark-theme label {
             color: #ecf0f1;
+        }
+
+        .light-theme label {
+            color: #2c3e50;
         }
         
         input {
             width: 100%;
-            padding: 12px;
+            padding: 15px;
             border: none;
-            border-radius: 8px;
-            background: rgba(255, 255, 255, 0.9);
+            border-radius: 12px;
             font-size: 16px;
+            transition: all 0.3s ease;
+        }
+
+        .dark-theme input {
+            background: rgba(255, 255, 255, 0.95);
+        }
+
+        .light-theme input {
+            background: rgba(255, 255, 255, 0.95);
+            border: 2px solid #e9ecef;
+        }
+
+        input:focus {
+            transform: scale(1.02);
+            outline: none;
         }
         
         button {
-            background: linear-gradient(45deg, #e74c3c, #e67e22);
+            background: linear-gradient(135deg, #e74c3c 0%, #e67e22 100%);
             color: white;
             border: none;
-            padding: 15px 30px;
-            border-radius: 8px;
+            padding: 18px 30px;
+            border-radius: 12px;
             font-size: 16px;
+            font-weight: bold;
             cursor: pointer;
             width: 100%;
-            transition: transform 0.3s;
+            transition: all 0.3s ease;
         }
         
         button:hover {
-            transform: translateY(-2px);
+            transform: translateY(-5px) scale(1.02);
+            animation: pulse 1s infinite;
         }
         
         .keys-list {
+            padding: 30px;
+            border-radius: 20px;
+            backdrop-filter: blur(20px);
+            animation: fadeInUp 0.8s ease-out 0.6s both;
+        }
+
+        .dark-theme .keys-list {
             background: rgba(255, 255, 255, 0.1);
-            padding: 20px;
-            border-radius: 15px;
-            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .light-theme .keys-list {
+            background: rgba(255, 255, 255, 0.8);
+            border: 1px solid rgba(0, 0, 0, 0.1);
         }
         
         .key-item {
-            background: rgba(255, 255, 255, 0.2);
-            padding: 15px;
-            margin: 10px 0;
-            border-radius: 8px;
+            padding: 20px;
+            margin: 15px 0;
+            border-radius: 15px;
+            animation: slideInRight 0.6s ease-out;
+            transition: all 0.3s ease;
+        }
+
+        @keyframes slideInRight {
+            from {
+                opacity: 0;
+                transform: translateX(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        .key-item:hover {
+            transform: translateX(10px) scale(1.02);
+        }
+
+        .dark-theme .key-item {
+            background: rgba(255, 255, 255, 0.15);
+        }
+
+        .light-theme .key-item {
+            background: rgba(0, 0, 0, 0.05);
         }
         
         .status-valid {
             color: #2ecc71;
+            font-weight: bold;
         }
         
         .status-invalid {
             color: #e74c3c;
+            font-weight: bold;
         }
         
         .webhook-setup {
+            padding: 30px;
+            border-radius: 20px;
+            margin-bottom: 25px;
+            animation: fadeInUp 0.8s ease-out 0.1s both;
+        }
+
+        .dark-theme .webhook-setup {
             background: rgba(255, 255, 255, 0.1);
-            padding: 20px;
-            border-radius: 15px;
-            margin-bottom: 20px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .light-theme .webhook-setup {
+            background: rgba(255, 255, 255, 0.8);
+            border: 1px solid rgba(0, 0, 0, 0.1);
+        }
+        
+        .copy-btn {
+            background: linear-gradient(135deg, #27ae60, #2ecc71);
+            padding: 12px 20px;
+            border: none;
+            border-radius: 8px;
+            color: white;
+            cursor: pointer;
+            margin-top: 15px;
+            font-weight: bold;
+            transition: all 0.3s ease;
+        }
+
+        .copy-btn:hover {
+            transform: translateY(-3px) scale(1.05);
+            animation: pulse 1s infinite;
+        }
+        
+        .time-left {
+            font-weight: bold;
+            font-size: 1.1em;
+        }
+
+        .dark-theme .time-left {
+            color: #f39c12;
+        }
+
+        .light-theme .time-left {
+            color: #e67e22;
+        }
+
+        .session-warning {
+            color: #e74c3c;
+            font-weight: bold;
+            animation: pulse 2s infinite;
+        }
+
+        small {
+            opacity: 0.8;
         }
     </style>
 </head>
-<body>
+<body class="dark-theme">
     <div class="container">
+        <div class="settings-panel">
+            <div>
+                <button class="theme-toggle" onclick="toggleTheme()">🌙 Dark Theme</button>
+            </div>
+            <div>
+                <button class="lang-toggle" onclick="toggleLanguage()">🇷🇺 Русский</button>
+            </div>
+        </div>
+
         <div class="header">
-            <div class="logo">🧠 Steel Brainrot</div>
-            <div>Система 24-часовых ключей</div>
+            <div class="logo">🧠 Steal a brainrot hub</div>
+            <div data-lang="subtitle">24-Hour Session Key System</div>
         </div>
 
         <div class="webhook-setup">
-            <h2>🔧 Настройка вебхука</h2>
+            <h2 data-lang="webhook-title">🔧 Webhook Setup</h2>
             <div class="form-group">
-                <label for="webhookUrl">URL вебхука Discord:</label>
-                <input type="text" id="webhookUrl" placeholder="https://discord.com/api/webhooks/1434166089142763563/UqJ-Z7TPPpkt7o0GSaK9hctA8bzuBY6EUsxExnVuH8kFfu0hepH3xscAIQzFGfly9IWt>
-                <small style="color: #bdc3c7;">Получите в настройках Discord сервера</small>
+                <label for="webhookUrl" data-lang="webhook-label">Discord Webhook URL:</label>
+                <input type="text" id="webhookUrl" placeholder="https://discord.com/api/webhooks/...">
+                <small style="opacity: 0.7;" data-lang="webhook-hint">Get it from Discord server settings</small>
             </div>
-            <button onclick="saveWebhook()">Сохранить вебхук</button>
-            <button onclick="testWebhook()" style="background: #3498db; margin-top: 10px;">Тест вебхука</button>
+            <button onclick="saveWebhook()" data-lang="save-webhook">Save Webhook</button>
+            <button onclick="testWebhook()" style="background: linear-gradient(135deg, #3498db, #2980b9); margin-top: 10px;" data-lang="test-webhook">Test Webhook</button>
         </div>
         
         <div class="key-form">
-            <h2>🔑 Активация ключа</h2>
+            <h2 data-lang="activate-title">🔑 Key Activation</h2>
             <div class="form-group">
-                <label for="keyInput">Введите ключ:</label>
-                <input type="text" id="keyInput" placeholder="STEEL-XXXX-XXXX-XXXX">
+                <label for="keyInput" data-lang="key-label">Enter key:</label>
+                <input type="text" id="keyInput" placeholder="STEAL-24H-XXXX-XXXX">
             </div>
-            <button onclick="activateKey()">Активировать ключ</button>
+            <button onclick="activateKey()" data-lang="activate-button">Activate Key</button>
         </div>
 
         <div class="key-form">
-            <h2>🛠️ Генератор ключей</h2>
+            <h2 data-lang="generate-title">🛠️ Key Generator (24 hours)</h2>
             <div class="form-group">
-                <label for="hoursInput">Часы активности:</label>
-                <input type="number" id="hoursInput" value="24" min="1" max="720">
+                <label data-lang="fixed-hours">⏰ All keys expire after 24 hours</label>
+                <input type="text" value="24 hours - AUTO DELETE" disabled style="opacity: 0.7;">
             </div>
-            <button onclick="generateKey()">Сгенерировать ключ</button>
-            <div id="generatedKey" style="margin-top: 15px; padding: 10px; background: rgba(255,255,255,0.2); border-radius: 5px; display: none;"></div>
+            <button onclick="generate24hKey()" data-lang="generate-button">Generate 24-hour Key</button>
+            <div id="generatedKey" style="margin-top: 15px; padding: 20px; border-radius: 10px; display: none;"></div>
         </div>
         
         <div class="keys-list">
-            <h2>📋 Активные ключи</h2>
+            <h2 data-lang="keys-title">📋 Active Keys</h2>
+            <div class="session-warning" data-lang="session-warning">⚠️ Sessions automatically delete after 24 hours!</div>
             <div id="keysContainer">
-                <!-- Ключи загружаются здесь -->
+                <!-- Keys load here -->
             </div>
         </div>
     </div>
 
     <script>
-        // Получение сохраненного вебхука
+        const translations = {
+            'ru': {
+                'subtitle': '24-Часовая Система Ключей',
+                'webhook-title': '🔧 Настройка вебхука',
+                'webhook-label': 'URL вебхука Discord:',
+                'webhook-hint': 'Получите в настройках Discord сервера',
+                'save-webhook': 'Сохранить вебхук',
+                'test-webhook': 'Тест вебхука',
+                'activate-title': '🔑 Активация ключа',
+                'key-label': 'Введите ключ:',
+                'activate-button': 'Активировать ключ',
+                'generate-title': '🛠️ Генератор ключей (24 часа)',
+                'fixed-hours': '⏰ Все ключи удаляются через 24 часа',
+                'generate-button': 'Сгенерировать ключ',
+                'keys-title': '📋 Активные ключи',
+                'session-warning': '⚠️ Сессии автоматически удаляются через 24 часа!',
+                'no-keys': 'Нет активных ключей',
+                'active': 'Активен',
+                'expired': 'Просрочен',
+                'activated': 'Активирован',
+                'not-activated': 'Не активирован',
+                'time-left': 'Осталось:',
+                'created': 'Создан:',
+                'expires': 'Удаляется:',
+                'copy-key': 'Копировать ключ',
+                'key-copied': 'Ключ скопирован!',
+                'enter-key': 'Введите ключ!',
+                'key-not-found': '❌ Ключ не найден!',
+                'key-expired': '❌ Ключ просрочен!',
+                'key-activated': '❌ Ключ уже активирован!',
+                'activation-success': '✅ Ключ активирован!',
+                'program-code': 'Ваш код:',
+                'valid-until': 'Действует до:',
+                'copy-to-program': 'Скопируйте код в программу!',
+                'webhook-saved': '✅ Вебхук сохранен!',
+                'invalid-webhook': '❌ Неверный URL вебхука!',
+                'save-webhook-first': 'Сначала сохраните вебхук!',
+                'test-sent': '✅ Тест отправлен!',
+                'test-error': '❌ Ошибка:'
+            },
+            'en': {
+                'subtitle': '24-Hour Session Key System',
+                'webhook-title': '🔧 Webhook Setup',
+                'webhook-label': 'Discord Webhook URL:',
+                'webhook-hint': 'Get it from Discord server settings',
+                'save-webhook': 'Save Webhook',
+                'test-webhook': 'Test Webhook',
+                'activate-title': '🔑 Key Activation',
+                'key-label': 'Enter key:',
+                'activate-button': 'Activate Key',
+                'generate-title': '🛠️ Key Generator (24 hours)',
+                'fixed-hours': '⏰ All keys expire after 24 hours',
+                'generate-button': 'Generate 24-hour Key',
+                'keys-title': '📋 Active Keys',
+                'session-warning': '⚠️ Sessions automatically delete after 24 hours!',
+                'no-keys': 'No active keys',
+                'active': 'Active',
+                'expired': 'Expired',
+                'activated': 'Activated',
+                'not-activated': 'Not activated',
+                'time-left': 'Time left:',
+                'created': 'Created:',
+                'expires': 'Deletes:',
+                'copy-key': 'Copy key',
+                'key-copied': 'Key copied!',
+                'enter-key': 'Enter key!',
+                'key-not-found': '❌ Key not found!',
+                'key-expired': '❌ Key expired!',
+                'key-activated': '❌ Key already activated!',
+                'activation-success': '✅ Key activated!',
+                'program-code': 'Your code:',
+                'valid-until': 'Valid until:',
+                'copy-to-program': 'Copy code to program!',
+                'webhook-saved': '✅ Webhook saved!',
+                'invalid-webhook': '❌ Invalid webhook URL!',
+                'save-webhook-first': 'Save webhook first!',
+                'test-sent': '✅ Test sent!',
+                'test-error': '❌ Error:'
+            }
+        };
+
+        let currentLanguage = 'en';
+        let currentTheme = 'dark';
+
+        function toggleLanguage() {
+            currentLanguage = currentLanguage === 'ru' ? 'en' : 'ru';
+            updateLanguage();
+            updateLanguageButton();
+        }
+
+        function updateLanguageButton() {
+            const button = document.querySelector('.lang-toggle');
+            button.textContent = currentLanguage === 'ru' ? '🇷🇺 Русский' : '🇺🇸 English';
+        }
+
+        function updateLanguage() {
+            document.querySelectorAll('[data-lang]').forEach(element => {
+                const key = element.getAttribute('data-lang');
+                if (translations[currentLanguage][key]) {
+                    element.textContent = translations[currentLanguage][key];
+                }
+            });
+        }
+
+        function toggleTheme() {
+            currentTheme = currentTheme === 'dark' ? 'light' : 'dark';
+            document.body.className = currentTheme + '-theme';
+            updateThemeButton();
+        }
+
+        function updateThemeButton() {
+            const button = document.querySelector('.theme-toggle');
+            button.textContent = currentTheme === 'dark' ? '🌙 Dark Theme' : '☀️ Light Theme';
+        }
+
         function getWebhookUrl() {
             return localStorage.getItem('steelWebhook') || '';
         }
         
-        // Сохранение вебхука
         function saveWebhook() {
             const webhookUrl = document.getElementById('webhookUrl').value.trim();
             if (webhookUrl && webhookUrl.includes('discord.com/api/webhooks/')) {
                 localStorage.setItem('steelWebhook', webhookUrl);
-                alert('✅ Вебхук сохранен!');
+                alert(translations[currentLanguage]['webhook-saved']);
             } else {
-                alert('❌ Неверный URL вебхука!');
+                alert(translations[currentLanguage]['invalid-webhook']);
             }
         }
         
-        // Тест вебхука
         async function testWebhook() {
             const webhookUrl = getWebhookUrl();
             if (!webhookUrl) {
-                alert('Сначала сохраните вебхук!');
+                alert(translations[currentLanguage]['save-webhook-first']);
                 return;
             }
             
             try {
-                await sendWebhook('🧪 **Тестовое сообщение**\nВебхук работает корректно! ✅');
-                alert('✅ Тестовое сообщение отправлено!');
+                await sendWebhook('🧪 **Test Message**\nWebhook working! ✅\nTime: <t:' + Math.floor(Date.now()/1000) + ':F>');
+                alert(translations[currentLanguage]['test-sent']);
             } catch (error) {
-                alert('❌ Ошибка отправки: ' + error);
+                alert(translations[currentLanguage]['test-error'] + ' ' + error);
             }
         }
+
+        function showAlert(message, type) {
+            const alert = document.createElement('div');
+            alert.textContent = message;
+            alert.style.cssText = `
+                position: fixed;
+                top: 20px;
+                right: 20px;
+                padding: 15px 25px;
+                border-radius: 10px;
+                color: white;
+                font-weight: bold;
+                z-index: 1000;
+                animation: fadeInUp 0.6s ease;
+            `;
+            
+            if (type === 'success') {
+                alert.style.background = 'linear-gradient(135deg, #27ae60, #2ecc71)';
+            } else {
+                alert.style.background = 'linear-gradient(135deg, #e74c3c, #c0392b)';
+            }
+            
+            document.body.appendChild(alert);
+            
+            setTimeout(() => {
+                alert.remove();
+            }, 3000);
+        }
         
-        // Загрузка сохраненного вебхука при запуске
         window.addEventListener('load', function() {
             const savedWebhook = getWebhookUrl();
             if (savedWebhook) {
                 document.getElementById('webhookUrl').value = savedWebhook;
             }
+            startAutoCleanup();
+            displayKeys();
+            updateLanguageButton();
+            updateThemeButton();
         });
         
-        // Функция отправки в Discord
         async function sendWebhook(message) {
-            const webhookUrl = getWebhookUrl();
-            if (!webhookUrl) {
-                console.log('Вебхук не настроен');
-                return;
-            }
-            
-            try {
-                const response = await fetch(webhookUrl, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify({
-                        content: message,
-                        username: 'Steal Brainrot Keys',
-                        avatar_url: 'https://cdn-icons-png.flaticon.com/512/888/888859.png'
-                    })
-                });
-                
-                if (!response.ok) {
-                    throw new Error(`HTTP error! status: ${response.status}`);
-                }
-                
-                console.log('Сообщение отправлено в Discord');
-            } catch (error) {
-                console.error('Ошибка вебхука:', error);
-                throw error;
-            }
-        }
-        
-        // Хранилище ключей
-        let keys = JSON.parse(localStorage.getItem('steelKeys')) || [];
-        
-        // Генератор ключей
-        function generateKey() {
-            const hours = parseInt(document.getElementById('hoursInput').value);
-            const newKey = `STEEL-${Math.random().toString(36).substr(2, 4).toUpperCase()}-${Math.random().toString(36).substr(2, 4).toUpperCase()}-${Math.random().toString(36).substr(2, 4).toUpperCase()}`;
-            
-            const keyData = {
-                key: newKey,
-                created: new Date().toISOString(),
-                expires: new Date(Date.now() + hours * 60 * 60 * 1000).toISOString(),
-                activated: false,
-                activatedBy: null,
-                activationTime: null
-            };
-            
-            keys.push(keyData);
-            localStorage.setItem('steelKeys', JSON.stringify(keys));
-            
-            document.getElementById('generatedKey').style.display = 'block';
-            document.getElementById('generatedKey').innerHTML = `
-                <strong>🔑 Новый ключ:</strong> ${newKey}<br>
-                <strong>⏰ Действителен:</strong> ${hours} часов<br>
-                <button onclick="copyKey('${newKey}')" style="margin-top: 5px; padding: 5px 10px; background: #27ae60; border: none; border-radius: 3px; color: white; cursor: pointer;">Копировать</button>
-            `;
-            
-            // Отправка в Discord
-            sendWebhook(`🔑 **Сгенерирован новый ключ**\nКлюч: \`${newKey}\`\nЧасы: ${hours}\nВремя: <t:${Math.floor(Date.now()/1000)}:F>`);
-            
-            displayKeys();
-        }
-        
-        function copyKey(key) {
-            navigator.clipboard.writeText(key);
-            alert('Ключ скопирован!');
-        }
-        
-        // Активация ключа
-        async function activateKey() {
-            const keyInput = document.getElementById('keyInput').value.trim().toUpperCase();
-            
-            if (!keyInput) {
-                alert('Введите ключ!');
-                return;
-            }
-            
-            const keyIndex = keys.findIndex(k => k.key === keyInput);
-            
-            if (keyIndex === -1) {
-                alert('❌ Ключ не найден!');
-                sendWebhook(`❌ **Попытка активации несуществующего ключа**\nКлюч: \`${keyInput}\`\nВремя: <t:${Math.floor(Date.now()/1000)}:F>`);
-                return;
-            }
-            
-            const keyData = keys[keyIndex];
-            const now = new Date();
-            const expires = new Date(keyData.expires);
-            
-            if (now > expires) {
-                alert('❌ Ключ просрочен!');
-                sendWebhook(`⏰ **Попытка активации просроченного ключа**\nКлюч: \`${keyInput}\`\nВремя: <t:${Math.floor(Date.now()/1000)}:F>`);
-                return;
-            }
-            
-            if (keyData.activated) {
-                alert('❌ Ключ уже активирован!');
-                return;
-            }
-            
-            // Активируем ключ
-            keys[keyIndex].activated = true;
-            keys[keyIndex].activationTime = now.toISOString();
-            keys[keyIndex].activatedBy = 'User';
-            localStorage.setItem('steelKeys', JSON.stringify(keys));
-            
-            // Генерируем код для программы
-            const programCode = `SB-${Math.random().toString(36).substr(2, 8).toUpperCase()}`;
-            
-            alert(`✅ Ключ активирован!\nВаш код: ${programCode}\nДействует до: ${expires.toLocaleString()}`);
-            
-            // Отправка в Discord
-            await sendWebhook(`✅ **Ключ активирован**\nКлюч: \`${keyInput}\`\nКод программы: \`${programCode}\`\nДействует до: <t:${Math.floor(expires.getTime()/1000)}:F>\nВремя активации: <t:${Math.floor(Date.now()/1000)}:F>`);
-            
-            displayKeys();
-        }
-        
-        // Отображение ключей
-        function displayKeys() {
-            const container = document.getElementById('keysContainer');
-            container.innerHTML = '';
-            
-            // Очистка просроченных ключей
-            const now = new Date();
-            keys = keys.filter(key => new Date(key.expires) > now);
-            localStorage.setItem('steelKeys', JSON.stringify(keys));
-            
-            if (keys.length === 0) {
-                container.innerHTML = '<p>Нет активных ключей</p>';
-                return;
-            }
-            
-            keys.forEach(key => {
-                const expires = new Date(key.expires);
-                const isValid = expires > now;
-                
-                const keyElement = document.createElement('div');
-                keyElement.className = 'key-item';
-                keyElement.innerHTML = `
-                    <div>
-                        <strong>${key.key}</strong>
-                        <div class="${isValid ? 'status-valid' : 'status-invalid'}">
-                            ${isValid ? '✅ Активен' : '❌ Просрочен'} 
-                            ${key.activated ? '🔓 Активирован' : '🔒 Не активирован'}
-                        </div>
-                        <small>Создан: ${new Date(key.created).toLocaleString()}</small><br>
-                        <small>Истекает: ${expires.toLocaleString()}</small>
-                        ${key.activated ? `<br><small>Активирован: ${new Date(key.activationTime).toLocaleString()}</small>` : ''}
-                    </div>
-                `;
-                container.appendChild(keyElement);
-            });
-        }
-        
-        // Автоматическая проверка каждую минуту
-        setInterval(displayKeys, 60000);
-        
-        // Инициализация
-        displayKeys();
-    </script>
-</body>
-    </html>
+   
