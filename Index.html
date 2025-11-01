@@ -97,9 +97,6 @@
             padding: 15px;
             margin: 10px 0;
             border-radius: 8px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
         }
         
         .status-valid {
@@ -110,12 +107,11 @@
             color: #e74c3c;
         }
         
-        .admin-panel {
-            background: rgba(255, 0, 0, 0.1);
+        .webhook-setup {
+            background: rgba(255, 255, 255, 0.1);
             padding: 20px;
             border-radius: 15px;
-            margin-top: 20px;
-            border: 1px solid #e74c3c;
+            margin-bottom: 20px;
         }
     </style>
 </head>
@@ -124,6 +120,17 @@
         <div class="header">
             <div class="logo">🧠 Steel Brainrot</div>
             <div>Система 24-часовых ключей</div>
+        </div>
+
+        <div class="webhook-setup">
+            <h2>🔧 Настройка вебхука</h2>
+            <div class="form-group">
+                <label for="webhookUrl">URL вебхука Discord:</label>
+                <input type="text" id="webhookUrl" placeholder="https://discord.com/api/webhooks/1434166089142763563/UqJ-Z7TPPpkt7o0GSaK9hctA8bzuBY6EUsxExnVuH8kFfu0hepH3xscAIQzFGfly9IWt>
+                <small style="color: #bdc3c7;">Получите в настройках Discord сервера</small>
+            </div>
+            <button onclick="saveWebhook()">Сохранить вебхук</button>
+            <button onclick="testWebhook()" style="background: #3498db; margin-top: 10px;">Тест вебхука</button>
         </div>
         
         <div class="key-form">
@@ -136,7 +143,7 @@
         </div>
 
         <div class="key-form">
-            <h2>🛠️ Генератор ключей (Админ)</h2>
+            <h2>🛠️ Генератор ключей</h2>
             <div class="form-group">
                 <label for="hoursInput">Часы активности:</label>
                 <input type="number" id="hoursInput" value="24" min="1" max="720">
@@ -154,30 +161,80 @@
     </div>
 
     <script>
-        // ЗАМЕНИТЕ НА ВАШ WEBHOOK URL
-        const WEBHOOK_URL = "https://discord.com/api/webhooks/1431937434379354244/CPvQD2ZDmhNU1uMdScAA4CEPA4gls_UUxXCl4YDpDIOyncBzIEkJ456L5tYoQd0R7n8z";
+        // Получение сохраненного вебхука
+        function getWebhookUrl() {
+            return localStorage.getItem('steelWebhook') || '';
+        }
         
-        // Хранилище ключей (в реальном приложении используйте базу данных)
-        let keys = JSON.parse(localStorage.getItem('steelKeys')) || [];
+        // Сохранение вебхука
+        function saveWebhook() {
+            const webhookUrl = document.getElementById('webhookUrl').value.trim();
+            if (webhookUrl && webhookUrl.includes('discord.com/api/webhooks/')) {
+                localStorage.setItem('steelWebhook', webhookUrl);
+                alert('✅ Вебхук сохранен!');
+            } else {
+                alert('❌ Неверный URL вебхука!');
+            }
+        }
+        
+        // Тест вебхука
+        async function testWebhook() {
+            const webhookUrl = getWebhookUrl();
+            if (!webhookUrl) {
+                alert('Сначала сохраните вебхук!');
+                return;
+            }
+            
+            try {
+                await sendWebhook('🧪 **Тестовое сообщение**\nВебхук работает корректно! ✅');
+                alert('✅ Тестовое сообщение отправлено!');
+            } catch (error) {
+                alert('❌ Ошибка отправки: ' + error);
+            }
+        }
+        
+        // Загрузка сохраненного вебхука при запуске
+        window.addEventListener('load', function() {
+            const savedWebhook = getWebhookUrl();
+            if (savedWebhook) {
+                document.getElementById('webhookUrl').value = savedWebhook;
+            }
+        });
         
         // Функция отправки в Discord
         async function sendWebhook(message) {
+            const webhookUrl = getWebhookUrl();
+            if (!webhookUrl) {
+                console.log('Вебхук не настроен');
+                return;
+            }
+            
             try {
-                await fetch(WEBHOOK_URL, {
+                const response = await fetch(webhookUrl, {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
                     },
                     body: JSON.stringify({
                         content: message,
-                        username: 'Steel Brainrot Key System',
-                        avatar_url: 'https://i.imgur.com/l7eS8Wa.png'
+                        username: 'Steal Brainrot Keys',
+                        avatar_url: 'https://cdn-icons-png.flaticon.com/512/888/888859.png'
                     })
                 });
+                
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                
+                console.log('Сообщение отправлено в Discord');
             } catch (error) {
                 console.error('Ошибка вебхука:', error);
+                throw error;
             }
         }
+        
+        // Хранилище ключей
+        let keys = JSON.parse(localStorage.getItem('steelKeys')) || [];
         
         // Генератор ключей
         function generateKey() {
@@ -198,13 +255,13 @@
             
             document.getElementById('generatedKey').style.display = 'block';
             document.getElementById('generatedKey').innerHTML = `
-                <strong>Новый ключ:</strong> ${newKey}<br>
-                <strong>Действителен:</strong> ${hours} часов<br>
+                <strong>🔑 Новый ключ:</strong> ${newKey}<br>
+                <strong>⏰ Действителен:</strong> ${hours} часов<br>
                 <button onclick="copyKey('${newKey}')" style="margin-top: 5px; padding: 5px 10px; background: #27ae60; border: none; border-radius: 3px; color: white; cursor: pointer;">Копировать</button>
             `;
             
             // Отправка в Discord
-            sendWebhook(`🔑 **Сгенерирован новый ключ**\nКлюч: ||${newKey}||\nЧасы: ${hours}\nВремя: <t:${Math.floor(Date.now()/1000)}:F>`);
+            sendWebhook(`🔑 **Сгенерирован новый ключ**\nКлюч: \`${newKey}\`\nЧасы: ${hours}\nВремя: <t:${Math.floor(Date.now()/1000)}:F>`);
             
             displayKeys();
         }
@@ -215,7 +272,7 @@
         }
         
         // Активация ключа
-        function activateKey() {
+        async function activateKey() {
             const keyInput = document.getElementById('keyInput').value.trim().toUpperCase();
             
             if (!keyInput) {
@@ -227,7 +284,7 @@
             
             if (keyIndex === -1) {
                 alert('❌ Ключ не найден!');
-                sendWebhook(`❌ **Попытка активации несуществующего ключа**\nКлюч: ${keyInput}\nВремя: <t:${Math.floor(Date.now()/1000)}:F>`);
+                sendWebhook(`❌ **Попытка активации несуществующего ключа**\nКлюч: \`${keyInput}\`\nВремя: <t:${Math.floor(Date.now()/1000)}:F>`);
                 return;
             }
             
@@ -237,7 +294,7 @@
             
             if (now > expires) {
                 alert('❌ Ключ просрочен!');
-                sendWebhook(`⏰ **Попытка активации просроченного ключа**\nКлюч: ${keyInput}\nВремя: <t:${Math.floor(Date.now()/1000)}:F>`);
+                sendWebhook(`⏰ **Попытка активации просроченного ключа**\nКлюч: \`${keyInput}\`\nВремя: <t:${Math.floor(Date.now()/1000)}:F>`);
                 return;
             }
             
@@ -249,7 +306,7 @@
             // Активируем ключ
             keys[keyIndex].activated = true;
             keys[keyIndex].activationTime = now.toISOString();
-            keys[keyIndex].activatedBy = 'User'; // Можно добавить идентификатор пользователя
+            keys[keyIndex].activatedBy = 'User';
             localStorage.setItem('steelKeys', JSON.stringify(keys));
             
             // Генерируем код для программы
@@ -258,7 +315,7 @@
             alert(`✅ Ключ активирован!\nВаш код: ${programCode}\nДействует до: ${expires.toLocaleString()}`);
             
             // Отправка в Discord
-            sendWebhook(`✅ **Ключ активирован**\nКлюч: ||${keyInput}||\nКод программы: ||${programCode}||\nДействует до: <t:${Math.floor(expires.getTime()/1000)}:F>\nВремя активации: <t:${Math.floor(Date.now()/1000)}:F>`);
+            await sendWebhook(`✅ **Ключ активирован**\nКлюч: \`${keyInput}\`\nКод программы: \`${programCode}\`\nДействует до: <t:${Math.floor(expires.getTime()/1000)}:F>\nВремя активации: <t:${Math.floor(Date.now()/1000)}:F>`);
             
             displayKeys();
         }
@@ -269,7 +326,8 @@
             container.innerHTML = '';
             
             // Очистка просроченных ключей
-            keys = keys.filter(key => new Date(key.expires) > new Date());
+            const now = new Date();
+            keys = keys.filter(key => new Date(key.expires) > now);
             localStorage.setItem('steelKeys', JSON.stringify(keys));
             
             if (keys.length === 0) {
@@ -279,7 +337,6 @@
             
             keys.forEach(key => {
                 const expires = new Date(key.expires);
-                const now = new Date();
                 const isValid = expires > now;
                 
                 const keyElement = document.createElement('div');
@@ -295,22 +352,9 @@
                         <small>Истекает: ${expires.toLocaleString()}</small>
                         ${key.activated ? `<br><small>Активирован: ${new Date(key.activationTime).toLocaleString()}</small>` : ''}
                     </div>
-                    <div>
-                        <button onclick="deleteKey('${key.key}')" style="padding: 5px 10px; background: #e74c3c; border: none; border-radius: 3px; color: white; cursor: pointer;">Удалить</button>
-                    </div>
                 `;
                 container.appendChild(keyElement);
             });
-        }
-        
-        // Удаление ключа
-        function deleteKey(keyToDelete) {
-            if (confirm('Удалить этот ключ?')) {
-                keys = keys.filter(k => k.key !== keyToDelete);
-                localStorage.setItem('steelKeys', JSON.stringify(keys));
-                displayKeys();
-                sendWebhook(`🗑️ **Ключ удален**\nКлюч: ${keyToDelete}\nВремя: <t:${Math.floor(Date.now()/1000)}:F>`);
-            }
         }
         
         // Автоматическая проверка каждую минуту
@@ -318,11 +362,6 @@
         
         // Инициализация
         displayKeys();
-        
-        // Отправка сообщения о запуске системы
-        window.addEventListener('load', () => {
-            sendWebhook('🚀 **Система ключей Steel Brainrot запущена**\nВремя: <t:${Math.floor(Date.now()/1000)}:F>');
-        });
     </script>
 </body>
-</html>
+    </html>
