@@ -3,30 +3,34 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Steel Brainrot - Keys</title>
+    <title>Steel Brainrot - Key System</title>
     <style>
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
+            font-family: 'Arial', sans-serif;
         }
         
         body {
-            font-family: 'Arial', sans-serif;
-            background: linear-gradient(135deg, #1a1a2e, #16213e);
+            background: linear-gradient(135deg, #1a1a2e, #16213e, #0f3460);
             color: white;
             min-height: 100vh;
+            padding: 20px;
         }
         
         .container {
             max-width: 800px;
             margin: 0 auto;
-            padding: 20px;
         }
         
         .header {
             text-align: center;
             margin-bottom: 40px;
+            padding: 30px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 15px;
+            backdrop-filter: blur(10px);
         }
         
         .logo {
@@ -36,11 +40,6 @@
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
             margin-bottom: 10px;
-        }
-        
-        .subtitle {
-            color: #bdc3c7;
-            font-size: 1.1em;
         }
         
         .key-form {
@@ -61,7 +60,7 @@
             color: #ecf0f1;
         }
         
-        input, textarea {
+        input {
             width: 100%;
             padding: 12px;
             border: none;
@@ -111,11 +110,12 @@
             color: #e74c3c;
         }
         
-        .instructions {
-            margin-top: 40px;
-            background: rgba(255, 255, 255, 0.1);
+        .admin-panel {
+            background: rgba(255, 0, 0, 0.1);
             padding: 20px;
             border-radius: 15px;
+            margin-top: 20px;
+            border: 1px solid #e74c3c;
         }
     </style>
 </head>
@@ -123,85 +123,206 @@
     <div class="container">
         <div class="header">
             <div class="logo">🧠 Steel Brainrot</div>
-            <div class="subtitle">Система управления ключами доступа</div>
+            <div>Система 24-часовых ключей</div>
         </div>
         
         <div class="key-form">
-            <h2>Активация ключа</h2>
+            <h2>🔑 Активация ключа</h2>
             <div class="form-group">
                 <label for="keyInput">Введите ключ:</label>
-                <input type="text" id="keyInput" placeholder="XXXX-XXXX-XXXX-XXXX">
+                <input type="text" id="keyInput" placeholder="STEEL-XXXX-XXXX-XXXX">
             </div>
             <button onclick="activateKey()">Активировать ключ</button>
         </div>
-        
-        <div class="keys-list">
-            <h2>Доступные ключи</h2>
-            <div id="keysContainer">
-                <!-- Ключи будут загружены здесь -->
+
+        <div class="key-form">
+            <h2>🛠️ Генератор ключей (Админ)</h2>
+            <div class="form-group">
+                <label for="hoursInput">Часы активности:</label>
+                <input type="number" id="hoursInput" value="24" min="1" max="720">
             </div>
+            <button onclick="generateKey()">Сгенерировать ключ</button>
+            <div id="generatedKey" style="margin-top: 15px; padding: 10px; background: rgba(255,255,255,0.2); border-radius: 5px; display: none;"></div>
         </div>
         
-        <div class="instructions">
-            <h3>Инструкция по активации:</h3>
-            <p>1. Получите ключ у администратора</p>
-            <p>2. Введите ключ в поле выше</p>
-            <p>3. Нажмите "Активировать ключ"</p>
-            <p>4. Используйте полученный код в программе</p>
+        <div class="keys-list">
+            <h2>📋 Активные ключи</h2>
+            <div id="keysContainer">
+                <!-- Ключи загружаются здесь -->
+            </div>
         </div>
     </div>
 
     <script>
-        // Пример ключей (в реальности нужно подключить базу данных)
-        const sampleKeys = [
-            { key: "BRAIN-ROT1-2024-CODE", status: "active", uses: 3 },
-            { key: "STEEL-KEY2-PREM-IUM", status: "active", uses: 1 },
-            { key: "CHEAT-PRO3-FULL-ACC", status: "expired", uses: 0 }
-        ];
+        // ЗАМЕНИТЕ НА ВАШ WEBHOOK URL
+        const WEBHOOK_URL = "https://discord.com/api/webhooks/1431937434379354244/CPvQD2ZDmhNU1uMdScAA4CEPA4gls_UUxXCl4YDpDIOyncBzIEkJ456L5tYoQd0R7n8z";
         
-        function displayKeys() {
-            const container = document.getElementById('keysContainer');
-            container.innerHTML = '';
-            
-            sampleKeys.forEach(item => {
-                const keyElement = document.createElement('div');
-                keyElement.className = 'key-item';
-                keyElement.innerHTML = `
-                    <div>
-                        <strong>${item.key}</strong>
-                        <div class="status-${item.status === 'active' ? 'valid' : 'invalid'}">
-                            ${item.status === 'active' ? '✅ Активен' : '❌ Неактивен'}
-                        </div>
-                    </div>
-                    <div>Использований: ${item.uses}</div>
-                `;
-                container.appendChild(keyElement);
-            });
+        // Хранилище ключей (в реальном приложении используйте базу данных)
+        let keys = JSON.parse(localStorage.getItem('steelKeys')) || [];
+        
+        // Функция отправки в Discord
+        async function sendWebhook(message) {
+            try {
+                await fetch(WEBHOOK_URL, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        content: message,
+                        username: 'Steel Brainrot Key System',
+                        avatar_url: 'https://i.imgur.com/l7eS8Wa.png'
+                    })
+                });
+            } catch (error) {
+                console.error('Ошибка вебхука:', error);
+            }
         }
         
+        // Генератор ключей
+        function generateKey() {
+            const hours = parseInt(document.getElementById('hoursInput').value);
+            const newKey = `STEEL-${Math.random().toString(36).substr(2, 4).toUpperCase()}-${Math.random().toString(36).substr(2, 4).toUpperCase()}-${Math.random().toString(36).substr(2, 4).toUpperCase()}`;
+            
+            const keyData = {
+                key: newKey,
+                created: new Date().toISOString(),
+                expires: new Date(Date.now() + hours * 60 * 60 * 1000).toISOString(),
+                activated: false,
+                activatedBy: null,
+                activationTime: null
+            };
+            
+            keys.push(keyData);
+            localStorage.setItem('steelKeys', JSON.stringify(keys));
+            
+            document.getElementById('generatedKey').style.display = 'block';
+            document.getElementById('generatedKey').innerHTML = `
+                <strong>Новый ключ:</strong> ${newKey}<br>
+                <strong>Действителен:</strong> ${hours} часов<br>
+                <button onclick="copyKey('${newKey}')" style="margin-top: 5px; padding: 5px 10px; background: #27ae60; border: none; border-radius: 3px; color: white; cursor: pointer;">Копировать</button>
+            `;
+            
+            // Отправка в Discord
+            sendWebhook(`🔑 **Сгенерирован новый ключ**\nКлюч: ||${newKey}||\nЧасы: ${hours}\nВремя: <t:${Math.floor(Date.now()/1000)}:F>`);
+            
+            displayKeys();
+        }
+        
+        function copyKey(key) {
+            navigator.clipboard.writeText(key);
+            alert('Ключ скопирован!');
+        }
+        
+        // Активация ключа
         function activateKey() {
-            const keyInput = document.getElementById('keyInput').value;
+            const keyInput = document.getElementById('keyInput').value.trim().toUpperCase();
             
             if (!keyInput) {
                 alert('Введите ключ!');
                 return;
             }
             
-            // Здесь должна быть проверка ключа через API/базу данных
-            const foundKey = sampleKeys.find(k => k.key === keyInput && k.status === 'active' && k.uses > 0);
+            const keyIndex = keys.findIndex(k => k.key === keyInput);
             
-            if (foundKey) {
-                alert('✅ Ключ активирован! Ваш код: SB-' + Math.random().toString(36).substr(2, 8).toUpperCase());
-                foundKey.uses--;
-            } else {
-                alert('❌ Неверный или неактивный ключ!');
+            if (keyIndex === -1) {
+                alert('❌ Ключ не найден!');
+                sendWebhook(`❌ **Попытка активации несуществующего ключа**\nКлюч: ${keyInput}\nВремя: <t:${Math.floor(Date.now()/1000)}:F>`);
+                return;
             }
+            
+            const keyData = keys[keyIndex];
+            const now = new Date();
+            const expires = new Date(keyData.expires);
+            
+            if (now > expires) {
+                alert('❌ Ключ просрочен!');
+                sendWebhook(`⏰ **Попытка активации просроченного ключа**\nКлюч: ${keyInput}\nВремя: <t:${Math.floor(Date.now()/1000)}:F>`);
+                return;
+            }
+            
+            if (keyData.activated) {
+                alert('❌ Ключ уже активирован!');
+                return;
+            }
+            
+            // Активируем ключ
+            keys[keyIndex].activated = true;
+            keys[keyIndex].activationTime = now.toISOString();
+            keys[keyIndex].activatedBy = 'User'; // Можно добавить идентификатор пользователя
+            localStorage.setItem('steelKeys', JSON.stringify(keys));
+            
+            // Генерируем код для программы
+            const programCode = `SB-${Math.random().toString(36).substr(2, 8).toUpperCase()}`;
+            
+            alert(`✅ Ключ активирован!\nВаш код: ${programCode}\nДействует до: ${expires.toLocaleString()}`);
+            
+            // Отправка в Discord
+            sendWebhook(`✅ **Ключ активирован**\nКлюч: ||${keyInput}||\nКод программы: ||${programCode}||\nДействует до: <t:${Math.floor(expires.getTime()/1000)}:F>\nВремя активации: <t:${Math.floor(Date.now()/1000)}:F>`);
             
             displayKeys();
         }
         
+        // Отображение ключей
+        function displayKeys() {
+            const container = document.getElementById('keysContainer');
+            container.innerHTML = '';
+            
+            // Очистка просроченных ключей
+            keys = keys.filter(key => new Date(key.expires) > new Date());
+            localStorage.setItem('steelKeys', JSON.stringify(keys));
+            
+            if (keys.length === 0) {
+                container.innerHTML = '<p>Нет активных ключей</p>';
+                return;
+            }
+            
+            keys.forEach(key => {
+                const expires = new Date(key.expires);
+                const now = new Date();
+                const isValid = expires > now;
+                
+                const keyElement = document.createElement('div');
+                keyElement.className = 'key-item';
+                keyElement.innerHTML = `
+                    <div>
+                        <strong>${key.key}</strong>
+                        <div class="${isValid ? 'status-valid' : 'status-invalid'}">
+                            ${isValid ? '✅ Активен' : '❌ Просрочен'} 
+                            ${key.activated ? '🔓 Активирован' : '🔒 Не активирован'}
+                        </div>
+                        <small>Создан: ${new Date(key.created).toLocaleString()}</small><br>
+                        <small>Истекает: ${expires.toLocaleString()}</small>
+                        ${key.activated ? `<br><small>Активирован: ${new Date(key.activationTime).toLocaleString()}</small>` : ''}
+                    </div>
+                    <div>
+                        <button onclick="deleteKey('${key.key}')" style="padding: 5px 10px; background: #e74c3c; border: none; border-radius: 3px; color: white; cursor: pointer;">Удалить</button>
+                    </div>
+                `;
+                container.appendChild(keyElement);
+            });
+        }
+        
+        // Удаление ключа
+        function deleteKey(keyToDelete) {
+            if (confirm('Удалить этот ключ?')) {
+                keys = keys.filter(k => k.key !== keyToDelete);
+                localStorage.setItem('steelKeys', JSON.stringify(keys));
+                displayKeys();
+                sendWebhook(`🗑️ **Ключ удален**\nКлюч: ${keyToDelete}\nВремя: <t:${Math.floor(Date.now()/1000)}:F>`);
+            }
+        }
+        
+        // Автоматическая проверка каждую минуту
+        setInterval(displayKeys, 60000);
+        
         // Инициализация
         displayKeys();
+        
+        // Отправка сообщения о запуске системы
+        window.addEventListener('load', () => {
+            sendWebhook('🚀 **Система ключей Steel Brainrot запущена**\nВремя: <t:${Math.floor(Date.now()/1000)}:F>');
+        });
     </script>
 </body>
-  </html>
+</html>
