@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Steel Brainrot - Keys</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Arial', sans-serif;
+            background: linear-gradient(135deg, #1a1a2e, #16213e);
+            color: white;
+            min-height: 100vh;
+        }
+        
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        
+        .header {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+        
+        .logo {
+            font-size: 2.5em;
+            font-weight: bold;
+            background: linear-gradient(45deg, #ff6b6b, #feca57);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 10px;
+        }
+        
+        .subtitle {
+            color: #bdc3c7;
+            font-size: 1.1em;
+        }
+        
+        .key-form {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 30px;
+            border-radius: 15px;
+            backdrop-filter: blur(10px);
+            margin-bottom: 30px;
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 8px;
+            color: #ecf0f1;
+        }
+        
+        input, textarea {
+            width: 100%;
+            padding: 12px;
+            border: none;
+            border-radius: 8px;
+            background: rgba(255, 255, 255, 0.9);
+            font-size: 16px;
+        }
+        
+        button {
+            background: linear-gradient(45deg, #e74c3c, #e67e22);
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            border-radius: 8px;
+            font-size: 16px;
+            cursor: pointer;
+            width: 100%;
+            transition: transform 0.3s;
+        }
+        
+        button:hover {
+            transform: translateY(-2px);
+        }
+        
+        .keys-list {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 20px;
+            border-radius: 15px;
+            backdrop-filter: blur(10px);
+        }
+        
+        .key-item {
+            background: rgba(255, 255, 255, 0.2);
+            padding: 15px;
+            margin: 10px 0;
+            border-radius: 8px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .status-valid {
+            color: #2ecc71;
+        }
+        
+        .status-invalid {
+            color: #e74c3c;
+        }
+        
+        .instructions {
+            margin-top: 40px;
+            background: rgba(255, 255, 255, 0.1);
+            padding: 20px;
+            border-radius: 15px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div class="logo">🧠 Steel Brainrot</div>
+            <div class="subtitle">Система управления ключами доступа</div>
+        </div>
+        
+        <div class="key-form">
+            <h2>Активация ключа</h2>
+            <div class="form-group">
+                <label for="keyInput">Введите ключ:</label>
+                <input type="text" id="keyInput" placeholder="XXXX-XXXX-XXXX-XXXX">
+            </div>
+            <button onclick="activateKey()">Активировать ключ</button>
+        </div>
+        
+        <div class="keys-list">
+            <h2>Доступные ключи</h2>
+            <div id="keysContainer">
+                <!-- Ключи будут загружены здесь -->
+            </div>
+        </div>
+        
+        <div class="instructions">
+            <h3>Инструкция по активации:</h3>
+            <p>1. Получите ключ у администратора</p>
+            <p>2. Введите ключ в поле выше</p>
+            <p>3. Нажмите "Активировать ключ"</p>
+            <p>4. Используйте полученный код в программе</p>
+        </div>
+    </div>
+
+    <script>
+        // Пример ключей (в реальности нужно подключить базу данных)
+        const sampleKeys = [
+            { key: "BRAIN-ROT1-2024-CODE", status: "active", uses: 3 },
+            { key: "STEEL-KEY2-PREM-IUM", status: "active", uses: 1 },
+            { key: "CHEAT-PRO3-FULL-ACC", status: "expired", uses: 0 }
+        ];
+        
+        function displayKeys() {
+            const container = document.getElementById('keysContainer');
+            container.innerHTML = '';
+            
+            sampleKeys.forEach(item => {
+                const keyElement = document.createElement('div');
+                keyElement.className = 'key-item';
+                keyElement.innerHTML = `
+                    <div>
+                        <strong>${item.key}</strong>
+                        <div class="status-${item.status === 'active' ? 'valid' : 'invalid'}">
+                            ${item.status === 'active' ? '✅ Активен' : '❌ Неактивен'}
+                        </div>
+                    </div>
+                    <div>Использований: ${item.uses}</div>
+                `;
+                container.appendChild(keyElement);
+            });
+        }
+        
+        function activateKey() {
+            const keyInput = document.getElementById('keyInput').value;
+            
+            if (!keyInput) {
+                alert('Введите ключ!');
+                return;
+            }
+            
+            // Здесь должна быть проверка ключа через API/базу данных
+            const foundKey = sampleKeys.find(k => k.key === keyInput && k.status === 'active' && k.uses > 0);
+            
+            if (foundKey) {
+                alert('✅ Ключ активирован! Ваш код: SB-' + Math.random().toString(36).substr(2, 8).toUpperCase());
+                foundKey.uses--;
+            } else {
+                alert('❌ Неверный или неактивный ключ!');
+            }
+            
+            displayKeys();
+        }
+        
+        // Инициализация
+        displayKeys();
+    </script>
+</body>
+  </html>
